@@ -1,0 +1,23 @@
+{
+  "name": "jack-black",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "rome check .",
+    "format": "rome format ."
+  },
+  "dependencies": {
+    "normalize.css": "^8.0.1",
+    "preact": "^10.13.0",
+    "tachyons": "^4.12.0"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.5.0",
+    "rome": "^11.0.0",
+    "vite": "^4.2.0"
+  }
+}

@@ -21,7 +21,7 @@ export const createDeck = () => {
       deck.push({ value: cards[j], suit: suits[i], seen: false });
     }
   }
-  return deck;
+  return deck.concat(deck.slice());
 };
 
 export const drawRandom = (deck) => {
@@ -42,4 +42,7 @@ export const drawRandom = (deck) => {
 
   return random;
 };
-const isEmptyDeck = () => {};
+
+export const isNearEmpty = (deck) => {
+  return deck.filter((card) => !card.seen).length < 4;
+};

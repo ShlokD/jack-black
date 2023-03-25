@@ -20,16 +20,20 @@ const PLAYER = "PLAYER";
 const DEALER = "DEALER";
 const END = "END";
 
+const winColor = {
+  W: "bg-blue",
+  L: "bg-red",
+  D: "bg-yellow",
+};
+
 const getEndMessage = (playerScore, dealerScore) => {
-  if (dealerScore > 21) {
-    return "You Win!";
+  if (dealerScore > 21 || (playerScore > dealerScore && playerScore <= 21)) {
+    return { state: "WIN" };
   }
-  if (playerScore > 21 || dealerScore > playerScore) {
-    return "You Lose!";
-  } else if (playerScore > dealerScore) {
-    return "You Win!";
+  if (dealerScore > playerScore) {
+    return { state: "LOSE" };
   } else if (playerScore === dealerScore) {
-    return "Draw!";
+    return { state: "DRAW" };
   }
 };
 
@@ -42,11 +46,26 @@ const createUserState = (deck) => {
   return { cards, score: getScore(cards) };
 };
 
+const Button = ({ disabled, children, ...rest }) => {
+  return (
+    <button
+      className={`pv2 ph4 ma2 b--none white br2 ${
+        disabled ? "bg-black-20" : "bg-black-50"
+      }`}
+      disabled={disabled}
+      {...rest}
+    >
+      {children}
+    </button>
+  );
+};
+
 export function App() {
   const [deck, setDeck] = useState(createDeck());
   const [currentGameState, setCurrentGameState] = useState("PLAYER");
   const [dealer, setDealer] = useState({ cards: [], score: 0 });
   const [player, setPlayer] = useState({ cards: [], score: 0 });
+  const [wins, setWins] = useState([]);
 
   const timer = createRef(null);
 
@@ -115,16 +134,6 @@ export function App() {
     }
   };
 
-  useEffect(() => {
-    if (currentGameState === "DEALER") {
-      updateVal();
-    } else {
-      clearInterval(timer.current);
-    }
-
-    return () => clearInterval(timer.current);
-  }, [currentGameState]);
-
   const handleDeal = () => {
     let currentDeck = deck;
 
@@ -136,8 +145,20 @@ export function App() {
 
     setDealer(createUserState(currentDeck));
     setPlayer(createUserState(currentDeck));
+    const score = getEndMessage(player.score, dealer.score);
+    setWins((prev) => [...prev, score.state[0]]);
     setCurrentGameState("PLAYER");
   };
+
+  useEffect(() => {
+    if (currentGameState === "DEALER") {
+      updateVal();
+    } else {
+      clearInterval(timer.current);
+    }
+
+    return () => clearInterval(timer.current);
+  }, [currentGameState]);
 
   useEffect(() => {
     setDealer(createUserState(deck));
@@ -146,43 +167,65 @@ export function App() {
 
   return (
     <>
-      <p>Dealer:</p>
-      {currentGameState === "PLAYER" ? (
-        <p>
-          {dealer.cards[0]?.suit}
-          {dealer.cards[0]?.value}
-        </p>
-      ) : (
-        dealer.cards.map((card) => (
-          <p>
-            {card?.suit}
-            {card?.value}
+      <h1>Black Jack</h1>
+      <div className="flex flex-column items-center justify-center">
+        {currentGameState === "PLAYER" ? (
+          <p className="pa2 f3">
+            {dealer.cards[0]?.suit}
+            {dealer.cards[0]?.value}
           </p>
-        ))
-      )}
-      <p>Dealer stops at 17, draws at 16</p>
-      {currentGameState !== "PLAYER" && <p>Dealer score: {dealer.score}</p>}
-      <hr className="ma4" />
-      <p>Player: </p>
-      <p>Score: {player.score}</p>
-      {player.cards.map((card) => (
-        <p>
-          {card?.suit}
-          {card?.value}
-        </p>
-      ))}
-      <button disabled={currentGameState !== "PLAYER"} onClick={handleHit}>
-        Hit
-      </button>
-      <button disabled={currentGameState !== "PLAYER"} onClick={handleStand}>
-        Stand
-      </button>
-      <button disabled={currentGameState !== "END"} onClick={handleDeal}>
-        Deal
-      </button>
-      {currentGameState === "END" && (
-        <p>{getEndMessage(player.score, dealer.score)}</p>
-      )}
+        ) : (
+          <div className="flex">
+            {dealer.cards.map((card) => (
+              <p className="pa2 f3">
+                {card?.suit}
+                {card?.value}
+              </p>
+            ))}
+          </div>
+        )}
+        <p className="ma0 f4">Dealer stops at 17, draws at 16</p>
+        {currentGameState !== "PLAYER" && <p className="f3">{dealer.score}</p>}
+        <hr className="ma4 b--solid bw2 br2 w-100" />
+        <div class="flex justify-center ma2 flex-wrap">
+          {wins.map((win) => (
+            <p
+              className={`bw1 b--black b--solid pa2 ${winColor[win]}`}
+              style={{ width: "36px" }}
+            >
+              {win}
+            </p>
+          ))}
+        </div>
+        <p className="f3 ma0">{player.score}</p>
+        <div className="flex">
+          {player.cards.map((card) => (
+            <p className="pa2 f3">
+              {card?.suit}
+              {card?.value}
+            </p>
+          ))}
+        </div>
+        <div className="flex items-center justify-center">
+          <Button disabled={currentGameState !== "PLAYER"} onClick={handleHit}>
+            Hit
+          </Button>
+          <Button
+            disabled={currentGameState !== "PLAYER"}
+            onClick={handleStand}
+          >
+            Stand
+          </Button>
+          <Button disabled={currentGameState !== "END"} onClick={handleDeal}>
+            Deal
+          </Button>
+        </div>
+        {currentGameState === "END" && (
+          <div>
+            <p>{getEndMessage(player.score, dealer.score)?.state}</p>
+          </div>
+        )}
+      </div>
     </>
   );
 }

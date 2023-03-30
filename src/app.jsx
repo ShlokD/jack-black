@@ -60,6 +60,17 @@ const Button = ({ disabled, children, ...rest }) => {
   );
 };
 
+const Card = ({ suit, value, color }) => {
+  return (
+    <p
+      className={`mw5 mh2 bg-white br3 pa3 pa4-ns mv3 ba b--black-10 f3 ${color}`}
+    >
+      {suit}
+      {value}
+    </p>
+  );
+};
+
 export function App() {
   const [deck, setDeck] = useState(createDeck());
   const [currentGameState, setCurrentGameState] = useState("PLAYER");
@@ -170,17 +181,11 @@ export function App() {
       <h1>Black Jack</h1>
       <div className="flex flex-column items-center justify-center">
         {currentGameState === "PLAYER" ? (
-          <p className="pa2 f3">
-            {dealer.cards[0]?.suit}
-            {dealer.cards[0]?.value}
-          </p>
+          <Card {...dealer.cards[0]} />
         ) : (
           <div className="flex">
             {dealer.cards.map((card) => (
-              <p className="pa2 f3">
-                {card?.suit}
-                {card?.value}
-              </p>
+              <Card {...card} />
             ))}
           </div>
         )}
@@ -197,15 +202,12 @@ export function App() {
             </p>
           ))}
         </div>
-        <p className="f3 ma0">{player.score}</p>
         <div className="flex">
           {player.cards.map((card) => (
-            <p className="pa2 f3">
-              {card?.suit}
-              {card?.value}
-            </p>
+            <Card {...card} />
           ))}
         </div>
+        <p className="f3 ma0n">{player.score}</p>
         <div className="flex items-center justify-center">
           <Button disabled={currentGameState !== "PLAYER"} onClick={handleHit}>
             Hit

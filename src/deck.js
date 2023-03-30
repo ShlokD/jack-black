@@ -1,4 +1,5 @@
-const suits = ["♥️", "♦️", "♠️", "♣️"];
+const reds = ["♥️", "♦️"];
+const blacks = ["♠️", "♣️"];
 const cards = [
   "A",
   "2",
@@ -16,9 +17,20 @@ const cards = [
 ];
 export const createDeck = () => {
   const deck = [];
-  for (let i = 0; i < suits.length; ++i) {
+  for (let i = 0; i < reds.length; ++i) {
     for (let j = 0; j < cards.length; ++j) {
-      deck.push({ value: cards[j], suit: suits[i], seen: false });
+      deck.push({ value: cards[j], suit: reds[i], seen: false, color: "red" });
+    }
+  }
+
+  for (let i = 0; i < blacks.length; ++i) {
+    for (let j = 0; j < cards.length; ++j) {
+      deck.push({
+        value: cards[j],
+        suit: blacks[i],
+        seen: false,
+        color: "black",
+      });
     }
   }
   return deck.concat(deck.slice());
